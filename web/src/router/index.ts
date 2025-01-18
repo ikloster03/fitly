@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('../views/WardrobeView.vue')
     },
     {
+      path: '/wardrobe/:slug',
+      name: 'wardrobe-category',
+      component: () => import('../views/WardrobeCategoryView.vue')
+    },
+    {
       path: '/looks',
       name: 'looks',
       component: () => import('../views/LooksView.vue')
