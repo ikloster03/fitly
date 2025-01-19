@@ -167,6 +167,15 @@
           </v-card-text>
 
           <v-card-actions>
+            <v-btn
+              v-if="isEditing"
+              color="warning"
+              variant="text"
+              prepend-icon="mdi-archive-outline"
+              @click="archiveItem"
+            >
+              {{ item.isArchived ? "Разархивировать" : "Архивировать" }}
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="grey-darken-1" variant="text" @click="$router.back()">
               Отмена
@@ -178,6 +187,41 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Диалог подтверждения архивации -->
+    <v-dialog v-model="archiveDialog" max-width="400">
+      <v-card>
+        <v-card-title class="text-h5">
+          {{ item.isArchived ? "Разархивировать вещь?" : "Архивировать вещь?" }}
+        </v-card-title>
+
+        <v-card-text>
+          {{
+            item.isArchived
+              ? "Вещь снова появится в вашем гардеробе."
+              : "Вещь будет скрыта из основного гардероба, но её можно будет восстановить позже."
+          }}
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            @click="archiveDialog = false"
+          >
+            Отмена
+          </v-btn>
+          <v-btn
+            :color="item.isArchived ? 'success' : 'warning'"
+            variant="text"
+            @click="confirmArchive"
+          >
+            {{ item.isArchived ? "Разархивировать" : "Архивировать" }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -257,22 +301,47 @@ const saveItem = async () => {
   router.back();
 };
 
-// Очищаем URL предпросмотра при размонтировании компонента
-onUnmounted(() => {
-  if (previewImage.value) {
-    URL.revokeObjectURL(previewImage.value);
+const archiveDialog = ref(false);
+
+const archiveItem = () => {
+  archiveDialog.value = true;
+};
+
+const confirmArchive = async () => {
+  item.value.isArchived = !item.value.isArchived;
+
+  // Здесь будет логика сохранения статуса архивации на сервере
+  console.log(
+    `Вещь ${item.value.isArchived ? "архивирована" : "разархивирована"}:`,
+    item.value
+  );
+
+  archiveDialog.value = false;
+
+  // Опционально: вернуться назад после архивации
+  if (item.value.isArchived) {
+    router.back();
   }
-});
+};
 
 onMounted(async () => {
   const itemId = route.params.id;
   if (itemId) {
     isEditing.value = true;
-    // Загружаем данные из моков
     const foundItem = mockItems.find((i) => i.id === Number(itemId));
     if (foundItem) {
-      item.value = { ...foundItem };
+      item.value = {
+        ...foundItem,
+        isArchived: foundItem.isArchived || false, // Устанавливаем значение по умолчанию
+      };
     }
+  }
+});
+
+// Очищаем URL предпросмотра при размонтировании компонента
+onUnmounted(() => {
+  if (previewImage.value) {
+    URL.revokeObjectURL(previewImage.value);
   }
 });
 </script>

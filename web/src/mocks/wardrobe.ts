@@ -19,6 +19,7 @@ export interface WardrobeItem {
   tags: string[];
   characteristics: Characteristic[];
   care: Care;
+  isArchived?: boolean;
 }
 
 export const mockItems: WardrobeItem[] = [
@@ -40,6 +41,7 @@ export const mockItems: WardrobeItem[] = [
       washing: "Стирка при 30°C, не отбеливать",
       additional: "Гладить при средней температуре",
     },
+    isArchived: false,
   },
   {
     id: 2,
@@ -59,6 +61,7 @@ export const mockItems: WardrobeItem[] = [
       washing: "Стирка при 40°C, не отбеливать",
       additional: "Не сушить в машинке",
     },
+    isArchived: false,
   },
   {
     id: 3,
@@ -78,5 +81,6 @@ export const mockItems: WardrobeItem[] = [
       washing: "Стирать наизнанку при 30°C",
       additional: "Гладить только с изнаночной стороны",
     },
+    isArchived: false,
   },
 ];
