@@ -1,206 +1,255 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 interface ClothingItem {
-  id: number
-  name: string
-  image: string
-  description: string
-  season: string[]
-  color: string[]
+  id: number;
+  name: string;
+  image: string;
+  description: string;
+  season: string[];
+  color: string[];
 }
 
 interface ItemGroup {
-  name: string
-  items: ClothingItem[]
+  name: string;
+  items: ClothingItem[];
 }
 
-const route = useRoute()
-const categorySlug = route.params.slug as string
+const route = useRoute();
+const categorySlug = route.params.slug as string;
 
 const category = ref({
-  name: '',
-  slug: '',
-  image: ''
-})
+  name: "",
+  slug: "",
+  image: "",
+});
 
 const items = ref<ClothingItem[]>([
   {
     id: 1,
-    name: 'Черная футболка',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
-    description: 'Базовая черная футболка из хлопка',
-    season: ['Весна', 'Лето', 'Осень'],
-    color: ['Черный']
+    name: "Черная футболка",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
+    description: "Базовая черная футболка из хлопка",
+    season: ["Весна", "Лето", "Осень"],
+    color: ["Черный"],
   },
   // Добавьте больше элементов для демонстрации
-])
+]);
 
-const dialog = ref(false)
-const groupDialog = ref(false)
+const dialog = ref(false);
+const groupDialog = ref(false);
 
 const newItem = ref({
-  name: '',
+  name: "",
   image: null as File | null,
-  imageUrl: '',
-  description: '',
+  imageUrl: "",
+  description: "",
   season: [] as string[],
   color: [] as string[],
-  group: null as string | null
-})
+  group: null as string | null,
+});
 
 const newGroup = ref({
-  name: '',
-  description: ''
-})
+  name: "",
+  description: "",
+});
 
-const seasons = ['Весна', 'Лето', 'Осень', 'Зима']
-const colors = ['Черный', 'Белый', 'Серый', 'Синий', 'Красный', 'Зеленый']
+const seasons = ["Весна", "Лето", "Осень", "Зима"];
+const colors = ["Черный", "Белый", "Серый", "Синий", "Красный", "Зеленый"];
 
 const itemGroups = ref<ItemGroup[]>([
   {
-    name: 'Базовые',
+    name: "Базовые",
     items: [
       {
         id: 1,
-        name: 'Черная футболка',
-        image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
-        description: 'Базовая черная футболка из хлопка',
-        season: ['Весна', 'Лето', 'Осень'],
-        color: ['Черный']
+        name: "Черная футболка",
+        image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
+        description: "Базовая черная футболка из хлопка",
+        season: ["Весна", "Лето", "Осень"],
+        color: ["Черный"],
       },
       {
         id: 2,
-        name: 'Белая футболка',
-        image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab',
-        description: 'Базовая белая футболка из хлопка',
-        season: ['Весна', 'Лето', 'Осень'],
-        color: ['Белый']
-      }
-    ]
+        name: "Белая футболка",
+        image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
+        description: "Базовая белая футболка из хлопка",
+        season: ["Весна", "Лето", "Осень"],
+        color: ["Белый"],
+      },
+    ],
   },
   {
-    name: 'Принты',
+    name: "Принты",
     items: [
       {
         id: 3,
-        name: 'Футболка с принтом',
-        image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a',
-        description: 'Черная футболка с графическим принтом',
-        season: ['Весна', 'Лето'],
-        color: ['Черный', 'Красный']
-      }
-    ]
+        name: "Футболка с принтом",
+        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a",
+        description: "Черная футболка с графическим принтом",
+        season: ["Весна", "Лето"],
+        color: ["Черный", "Красный"],
+      },
+    ],
   },
   {
-    name: 'Спортивные',
+    name: "Спортивные",
     items: [
       {
         id: 4,
-        name: 'Спортивная футболка',
-        image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820',
-        description: 'Дышащая футболка для спорта',
-        season: ['Весна', 'Лето', 'Осень'],
-        color: ['Серый']
-      }
-    ]
-  }
-])
+        name: "Спортивная футболка",
+        image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820",
+        description: "Дышащая футболка для спорта",
+        season: ["Весна", "Лето", "Осень"],
+        color: ["Серый"],
+      },
+    ],
+  },
+]);
 
 // Отдельный массив для вещей без группы
 const ungroupedItems = ref<ClothingItem[]>([
   {
     id: 10,
-    name: 'Новая футболка',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
-    description: 'Футболка без группы',
-    season: ['Лето'],
-    color: ['Синий']
+    name: "Новая футболка",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
+    description: "Футболка без группы",
+    season: ["Лето"],
+    color: ["Синий"],
   },
   {
     id: 11,
-    name: 'Еще одна футболка',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
-    description: 'Тоже без группы',
-    season: ['Весна', 'Лето'],
-    color: ['Зеленый']
-  }
-])
+    name: "Еще одна футболка",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
+    description: "Тоже без группы",
+    season: ["Весна", "Лето"],
+    color: ["Зеленый"],
+  },
+]);
 
-const showSpeedDial = ref(false)
+const showSpeedDial = ref(false);
+
+const editGroupDialog = ref(false);
+const editingGroup = ref<{
+  name: string;
+  description: string;
+  originalName: string;
+}>({
+  name: "",
+  description: "",
+  originalName: "",
+});
 
 onMounted(async () => {
   // Здесь будет запрос к API для получения информации о категории
   // Пока используем моковые данные
   category.value = {
-    name: 'Футболки',
+    name: "Футболки",
     slug: categorySlug,
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27'
-  }
-})
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
+  };
+});
 
 const addItem = () => {
-  dialog.value = true
-}
+  dialog.value = true;
+};
 
 const addGroup = () => {
-  groupDialog.value = true
-}
+  groupDialog.value = true;
+};
 
 const saveItem = () => {
   // Здесь будет логика сохранения
-  console.log('Сохранение вещи:', newItem.value)
-  
+  console.log("Сохранение вещи:", newItem.value);
+
   const item = {
     id: Math.random(), // временное решение для генерации ID
     name: newItem.value.name,
-    image: newItem.value.imageUrl || 'placeholder-image-url',
+    image: newItem.value.imageUrl || "placeholder-image-url",
     description: newItem.value.description,
     season: newItem.value.season,
-    color: newItem.value.color
-  }
+    color: newItem.value.color,
+  };
 
   // Добавляем вещь в выбранную группу или в ungroupedItems
   if (newItem.value.group) {
-    const targetGroup = itemGroups.value.find(g => g.name === newItem.value.group)
+    const targetGroup = itemGroups.value.find(
+      (g) => g.name === newItem.value.group
+    );
     if (targetGroup) {
-      targetGroup.items.push(item)
+      targetGroup.items.push(item);
     }
   } else {
-    ungroupedItems.value.push(item)
+    ungroupedItems.value.push(item);
   }
 
   // Очищаем форму и закрываем диалог
   newItem.value = {
-    name: '',
+    name: "",
     image: null,
-    imageUrl: '',
-    description: '',
+    imageUrl: "",
+    description: "",
     season: [],
     color: [],
-    group: null
-  }
-  dialog.value = false
-}
+    group: null,
+  };
+  dialog.value = false;
+};
 
 const saveGroup = () => {
   // Здесь будет логика сохранения новой группы
-  console.log('Сохранение группы:', newGroup.value)
-  
+  console.log("Сохранение группы:", newGroup.value);
+
   // Добавляем новую группу в массив
   itemGroups.value.push({
     name: newGroup.value.name,
-    items: []
-  })
-  
+    items: [],
+  });
+
   // Очищаем форму и закрываем диалог
   newGroup.value = {
-    name: '',
-    description: ''
+    name: "",
+    description: "",
+  };
+  groupDialog.value = false;
+};
+
+const editGroup = (group: ItemGroup) => {
+  editingGroup.value = {
+    name: group.name,
+    description: "", // Если у вас есть description в ItemGroup, добавьте его сюда
+    originalName: group.name,
+  };
+  editGroupDialog.value = true;
+};
+
+const deleteGroup = async (groupName: string) => {
+  if (
+    confirm(
+      'Вы уверены, что хотите удалить эту группу? Все вещи будут перемещены в раздел "Без группы"'
+    )
+  ) {
+    const group = itemGroups.value.find((g) => g.name === groupName);
+    if (group) {
+      // Перемещаем все вещи в ungroupedItems
+      ungroupedItems.value.push(...group.items);
+      // Удаляем группу
+      itemGroups.value = itemGroups.value.filter((g) => g.name !== groupName);
+    }
   }
-  groupDialog.value = false
-}
+};
+
+const saveEditedGroup = () => {
+  const groupIndex = itemGroups.value.findIndex(
+    (g) => g.name === editingGroup.value.originalName
+  );
+  if (groupIndex !== -1) {
+    itemGroups.value[groupIndex].name = editingGroup.value.name;
+    // Обновляем description, если он есть в вашей структуре данных
+  }
+  editGroupDialog.value = false;
+};
 </script>
 
 <template>
@@ -208,7 +257,10 @@ const saveGroup = () => {
     <!-- Заголовок категории -->
     <v-row class="ma-0">
       <v-col class="pa-0">
-        <div class="category-header" :style="{ backgroundImage: `url(${category.image})` }">
+        <div
+          class="category-header"
+          :style="{ backgroundImage: `url(${category.image})` }"
+        >
           <h1 class="text-h3">{{ category.name }}</h1>
         </div>
       </v-col>
@@ -246,19 +298,43 @@ const saveGroup = () => {
     <v-row class="ma-0">
       <v-col class="pa-2">
         <v-expansion-panels>
-          <v-expansion-panel
-            v-for="(group, i) in itemGroups"
-            :key="i"
-          >
+          <v-expansion-panel v-for="(group, i) in itemGroups" :key="i">
             <v-expansion-panel-title>
-              <div class="d-flex align-center">
-                <span class="text-h6">{{ group.name }}</span>
-                <v-chip class="ml-4" size="small">
-                  {{ group.items.length }}
-                </v-chip>
+              <div class="d-flex align-center justify-space-between w-100">
+                <div class="d-flex align-center">
+                  <span class="text-h6">{{ group.name }}</span>
+                  <v-chip class="ml-4" size="small">
+                    {{ group.items.length }}
+                  </v-chip>
+                </div>
+                <div class="d-flex align-center group-actions">
+                  <v-btn
+                    icon
+                    size="small"
+                    variant="text"
+                    @click.stop="editGroup(group)"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                    <v-tooltip activator="parent" location="top">
+                      Редактировать группу
+                    </v-tooltip>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    variant="text"
+                    color="error"
+                    @click.stop="deleteGroup(group.name)"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                    <v-tooltip activator="parent" location="top">
+                      Удалить группу
+                    </v-tooltip>
+                  </v-btn>
+                </div>
               </div>
             </v-expansion-panel-title>
-            
+
             <v-expansion-panel-text>
               <v-row>
                 <v-col
@@ -270,14 +346,10 @@ const saveGroup = () => {
                   lg="3"
                 >
                   <v-card>
-                    <v-img
-                      :src="item.image"
-                      height="200"
-                      cover
-                    ></v-img>
-                    
+                    <v-img :src="item.image" height="200" cover></v-img>
+
                     <v-card-title>{{ item.name }}</v-card-title>
-                    
+
                     <v-card-text>
                       <p>{{ item.description }}</p>
                       <v-chip-group>
@@ -326,14 +398,10 @@ const saveGroup = () => {
             lg="3"
           >
             <v-card>
-              <v-img
-                :src="item.image"
-                height="200"
-                cover
-              ></v-img>
-              
+              <v-img :src="item.image" height="200" cover></v-img>
+
               <v-card-title>{{ item.name }}</v-card-title>
-              
+
               <v-card-text>
                 <p>{{ item.description }}</p>
                 <v-chip-group>
@@ -347,11 +415,7 @@ const saveGroup = () => {
                   </v-chip>
                 </v-chip-group>
                 <v-chip-group>
-                  <v-chip
-                    v-for="color in item.color"
-                    :key="color"
-                    size="small"
-                  >
+                  <v-chip v-for="color in item.color" :key="color" size="small">
                     {{ color }}
                   </v-chip>
                 </v-chip-group>
@@ -363,7 +427,11 @@ const saveGroup = () => {
     </v-row>
 
     <!-- Кнопки добавления -->
-    <div class="speed-dial-container" @mouseenter="showSpeedDial = true" @mouseleave="showSpeedDial = false">
+    <div
+      class="speed-dial-container"
+      @mouseenter="showSpeedDial = true"
+      @mouseleave="showSpeedDial = false"
+    >
       <!-- Дополнительные кнопки -->
       <v-scale-transition>
         <div v-show="showSpeedDial" class="speed-dial-actions">
@@ -376,14 +444,11 @@ const saveGroup = () => {
             @click="addGroup"
           >
             <v-icon>mdi-tag-plus-outline</v-icon>
-            <v-tooltip
-              activator="parent"
-              location="left"
-            >
+            <v-tooltip activator="parent" location="left">
               Добавить группу
             </v-tooltip>
           </v-btn>
-          
+
           <v-btn
             class="mb-2"
             color="primary"
@@ -393,10 +458,7 @@ const saveGroup = () => {
             @click="addItem"
           >
             <v-icon>mdi-hanger</v-icon>
-            <v-tooltip
-              activator="parent"
-              location="left"
-            >
+            <v-tooltip activator="parent" location="left">
               Добавить вещь
             </v-tooltip>
           </v-btn>
@@ -412,22 +474,15 @@ const saveGroup = () => {
         icon
       >
         <v-icon>mdi-plus-circle-outline</v-icon>
-        <v-tooltip
-          activator="parent"
-          location="left"
-        >
-          Добавить
-        </v-tooltip>
+        <v-tooltip activator="parent" location="left"> Добавить </v-tooltip>
       </v-btn>
     </div>
 
     <!-- Диалог добавления новой вещи -->
     <v-dialog v-model="dialog" max-width="600">
       <v-card>
-        <v-card-title class="text-h5">
-          Новая вещь
-        </v-card-title>
-        
+        <v-card-title class="text-h5"> Новая вещь </v-card-title>
+
         <v-card-text>
           <v-container>
             <v-row>
@@ -436,14 +491,14 @@ const saveGroup = () => {
                   v-model="newItem.name"
                   label="Название"
                   required
-                  :rules="[v => !!v || 'Название обязательно']"
+                  :rules="[(v) => !!v || 'Название обязательно']"
                 ></v-text-field>
               </v-col>
 
               <v-col cols="12">
                 <v-select
                   v-model="newItem.group"
-                  :items="itemGroups.map(g => g.name)"
+                  :items="itemGroups.map((g) => g.name)"
                   label="Группа"
                   clearable
                   hint="Оставьте пустым, чтобы добавить вещь без группы"
@@ -505,11 +560,7 @@ const saveGroup = () => {
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="grey-darken-1"
-            variant="text"
-            @click="dialog = false"
-          >
+          <v-btn color="grey-darken-1" variant="text" @click="dialog = false">
             Отмена
           </v-btn>
           <v-btn
@@ -527,10 +578,8 @@ const saveGroup = () => {
     <!-- Диалог добавления новой группы -->
     <v-dialog v-model="groupDialog" max-width="500">
       <v-card>
-        <v-card-title class="text-h5">
-          Новая группа вещей
-        </v-card-title>
-        
+        <v-card-title class="text-h5"> Новая группа вещей </v-card-title>
+
         <v-card-text>
           <v-container>
             <v-row>
@@ -539,7 +588,7 @@ const saveGroup = () => {
                   v-model="newGroup.name"
                   label="Название группы"
                   required
-                  :rules="[v => !!v || 'Название обязательно']"
+                  :rules="[(v) => !!v || 'Название обязательно']"
                 ></v-text-field>
               </v-col>
 
@@ -576,6 +625,57 @@ const saveGroup = () => {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Диалог редактирования группы -->
+    <v-dialog v-model="editGroupDialog" max-width="500">
+      <v-card>
+        <v-card-title class="text-h5"> Редактировать группу </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="editingGroup.name"
+                  label="Название группы"
+                  required
+                  :rules="[(v) => !!v || 'Название обязательно']"
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="12">
+                <v-textarea
+                  v-model="editingGroup.description"
+                  label="Описание группы"
+                  rows="3"
+                  hint="Необязательное описание для группы"
+                  persistent-hint
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            @click="editGroupDialog = false"
+          >
+            Отмена
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="saveEditedGroup"
+            :disabled="!editingGroup.name"
+          >
+            Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -592,13 +692,13 @@ const saveGroup = () => {
 }
 
 .category-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.7));
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
 }
 
 .category-header h1 {
@@ -650,4 +750,17 @@ const saveGroup = () => {
 .speed-dial-container:hover .main-add-button {
   transform: rotate(45deg);
 }
-</style> 
+
+.group-actions {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.group-actions:hover {
+  opacity: 1;
+}
+
+.v-expansion-panel-title:hover .group-actions {
+  opacity: 1;
+}
+</style>
