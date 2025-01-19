@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { mockItems } from "../mocks/wardrobe";
 
 interface ClothingItem {
   id: number;
@@ -25,17 +26,7 @@ const category = ref({
   image: "",
 });
 
-const items = ref<ClothingItem[]>([
-  {
-    id: 1,
-    name: "Черная футболка",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
-    description: "Базовая черная футболка из хлопка",
-    season: ["Весна", "Лето", "Осень"],
-    color: ["Черный"],
-  },
-  // Добавьте больше элементов для демонстрации
-]);
+const items = ref(mockItems);
 
 const dialog = ref(false);
 const groupDialog = ref(false);
@@ -61,72 +52,25 @@ const colors = ["Черный", "Белый", "Серый", "Синий", "Кр�
 const itemGroups = ref<ItemGroup[]>([
   {
     name: "Базовые",
-    items: [
-      {
-        id: 1,
-        name: "Черная футболка",
-        image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
-        description: "Базовая черная футболка из хлопка",
-        season: ["Весна", "Лето", "Осень"],
-        color: ["Черный"],
-      },
-      {
-        id: 2,
-        name: "Белая футболка",
-        image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-        description: "Базовая белая футболка из хлопка",
-        season: ["Весна", "Лето", "Осень"],
-        color: ["Белый"],
-      },
-    ],
+    items: mockItems.filter((item) => item.tags.includes("Базовое")),
   },
   {
     name: "Принты",
-    items: [
-      {
-        id: 3,
-        name: "Футболка с принтом",
-        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a",
-        description: "Черная футболка с графическим принтом",
-        season: ["Весна", "Лето"],
-        color: ["Черный", "Красный"],
-      },
-    ],
+    items: mockItems.filter((item) => item.tags.includes("Принт")),
   },
   {
     name: "Спортивные",
-    items: [
-      {
-        id: 4,
-        name: "Спортивная футболка",
-        image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820",
-        description: "Дышащая футболка для спорта",
-        season: ["Весна", "Лето", "Осень"],
-        color: ["Серый"],
-      },
-    ],
+    items: mockItems.filter((item) => item.tags.includes("Спортивное")),
   },
 ]);
 
 // Отдельный массив для вещей без группы
-const ungroupedItems = ref<ClothingItem[]>([
-  {
-    id: 10,
-    name: "Новая футболка",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
-    description: "Футболка без группы",
-    season: ["Лето"],
-    color: ["Синий"],
-  },
-  {
-    id: 11,
-    name: "Еще одна футболка",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27",
-    description: "Тоже без группы",
-    season: ["Весна", "Лето"],
-    color: ["Зеленый"],
-  },
-]);
+const ungroupedItems = ref(
+  mockItems.filter(
+    (item) =>
+      !item.tags.some((tag) => ["Базовое", "Принт", "Спортивное"].includes(tag))
+  )
+);
 
 const showSpeedDial = ref(false);
 
@@ -345,7 +289,10 @@ const saveEditedGroup = () => {
                   md="4"
                   lg="3"
                 >
-                  <v-card>
+                  <v-card
+                    :to="{ name: 'wardrobe-item', params: { id: item.id } }"
+                    hover
+                  >
                     <v-img :src="item.image" height="200" cover></v-img>
 
                     <v-card-title>{{ item.name }}</v-card-title>
@@ -397,7 +344,10 @@ const saveEditedGroup = () => {
             md="4"
             lg="3"
           >
-            <v-card>
+            <v-card
+              :to="{ name: 'wardrobe-item', params: { id: item.id } }"
+              hover
+            >
               <v-img :src="item.image" height="200" cover></v-img>
 
               <v-card-title>{{ item.name }}</v-card-title>
