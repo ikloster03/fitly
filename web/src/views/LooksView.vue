@@ -25,6 +25,8 @@ const seasons = ['Весна', 'Лето', 'Осень', 'Зима']
 const availableTags = ['Casual', 'Деловой', 'Спортивный', 'Вечерний', 'Городской стиль']
 const availableGroups = ['Повседневные', 'Деловые', 'Праздничные', 'Спортивные', 'Домашние']
 
+const showSpeedDial = ref(false)
+
 const saveLook = () => {
   // Здесь будет логика сохранения нового образа
   console.log('Сохранение образа:', newLook.value)
@@ -33,6 +35,19 @@ const saveLook = () => {
 
 const navigateToItem = (itemId: number) => {
   router.push(`/wardrobe/items/${itemId}`)
+}
+
+const editLook = (lookId: number) => {
+  router.push(`/looks/${lookId}/edit`)
+}
+
+const createLook = () => {
+  router.push('/looks/new')
+}
+
+const addGroup = () => {
+  // Здесь будет логика добавления группы
+  console.log('Добавление группы')
 }
 </script>
 
@@ -254,15 +269,59 @@ const navigateToItem = (itemId: number) => {
       </v-row>
     </template>
 
-    <!-- Кнопка добавления -->
-    <v-btn
-      class="add-button"
-      color="primary"
-      icon="mdi-plus"
-      size="x-large"
-      elevation="3"
-      @click="dialog = true"
-    ></v-btn>
+    <!-- Кнопки добавления -->
+    <div
+      class="speed-dial-container"
+      @mouseenter="showSpeedDial = true"
+      @mouseleave="showSpeedDial = false"
+    >
+      <!-- Дополнительные кнопки -->
+      <v-scale-transition>
+        <div v-show="showSpeedDial" class="speed-dial-actions">
+          <v-btn
+            class="mb-2"
+            color="primary"
+            size="large"
+            elevation="3"
+            icon
+            @click="addGroup"
+          >
+            <v-icon>mdi-tag-plus-outline</v-icon>
+            <v-tooltip activator="parent" location="left">
+              Добавить группу
+            </v-tooltip>
+          </v-btn>
+
+          <v-btn
+            class="mb-2"
+            color="primary"
+            size="large"
+            elevation="3"
+            icon
+            @click="createLook"
+          >
+            <v-icon>mdi-tshirt-crew-outline</v-icon>
+            <v-tooltip activator="parent" location="left">
+              Добавить образ
+            </v-tooltip>
+          </v-btn>
+        </div>
+      </v-scale-transition>
+
+      <!-- Основная кнопка -->
+      <v-btn
+        class="main-add-button"
+        color="primary"
+        size="x-large"
+        elevation="3"
+        icon
+      >
+        <v-icon>mdi-plus-circle-outline</v-icon>
+        <v-tooltip activator="parent" location="left">
+          Добавить
+        </v-tooltip>
+      </v-btn>
+    </div>
 
     <!-- Диалог создания образа -->
     <v-dialog v-model="dialog" max-width="600">
@@ -372,5 +431,34 @@ const navigateToItem = (itemId: number) => {
 
 .cursor-pointer:hover {
   background-color: rgba(0, 0, 0, 0.04);
+}
+
+.speed-dial-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+.speed-dial-actions {
+  position: absolute;
+  bottom: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+  z-index: 101;
+}
+
+.main-add-button {
+  transition: transform 0.2s;
+  z-index: 102;
+}
+
+.speed-dial-container:hover .main-add-button {
+  transform: rotate(45deg);
 }
 </style> 

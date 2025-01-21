@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import LookEditView from '@/views/LookEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,6 +40,16 @@ const router = createRouter({
       component: () => import("../views/WardrobeItemView.vue"),
       props: true,
     },
+    {
+      path: '/looks/new',
+      name: 'look-new',
+      component: LookEditView
+    },
+    {
+      path: '/looks/:id/edit',
+      name: 'look-edit',
+      component: LookEditView
+    }
   ],
 });
 
