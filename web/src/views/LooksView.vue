@@ -6,7 +6,40 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const looks = ref<Look[]>(mockLooks)
-const groupedLooksData = computed(() => groupedLooks(looks.value))
+
+// Добавим интерфейс для группы
+interface LookGroup {
+  name: string
+  description: string
+}
+
+// Создадим массив для хранения групп
+const lookGroups = ref<LookGroup[]>([
+  { name: 'Повседневные', description: 'Образы для повседневной носки' },
+  { name: 'Деловые', description: 'Образы для работы и деловых встреч' },
+  { name: 'Праздничные', description: 'Образы для особых случаев' },
+  { name: 'Спортивные', description: 'Образы для спорта и активного отдыха' },
+  { name: 'Домашние', description: 'Образы для дома' }
+])
+
+const groupedLooksData = computed(() => {
+  const groups = {} as Record<string, Look[]>
+  
+  looks.value.forEach(look => {
+    if (!groups[look.group]) {
+      groups[look.group] = []
+    }
+    groups[look.group].push(look)
+  })
+  
+  // Возвращаем только группы, которые есть в lookGroups
+  return lookGroups.value.map(group => ({
+    name: group.name,
+    description: group.description,
+    items: groups[group.name] || []
+  }))
+})
+
 const ungroupedLooksData = computed(() => ungroupedLooks(looks.value))
 
 const dialog = ref(false)
@@ -26,6 +59,12 @@ const availableTags = ['Casual', 'Деловой', 'Спортивный', 'Ве
 const availableGroups = ['Повседневные', 'Деловые', 'Праздничные', 'Спортивные', 'Домашние']
 
 const showSpeedDial = ref(false)
+const groupDialog = ref(false)
+
+const newGroup = ref<LookGroup>({
+  name: '',
+  description: ''
+})
 
 const saveLook = () => {
   // Здесь будет логика сохранения нового образа
@@ -46,8 +85,30 @@ const createLook = () => {
 }
 
 const addGroup = () => {
-  // Здесь будет логика добавления группы
-  console.log('Добавление группы')
+  groupDialog.value = true
+}
+
+const saveGroup = () => {
+  // Проверяем, не существует ли уже группа с таким именем
+  if (!lookGroups.value.some(group => group.name === newGroup.value.name)) {
+    // Добавляем новую группу в массив
+    lookGroups.value.push({
+      name: newGroup.value.name,
+      description: newGroup.value.description
+    })
+
+    console.log('Группа создана:', newGroup.value)
+  } else {
+    console.warn('Группа с таким названием уже существует')
+    // Здесь можно добавить уведомление пользователю
+  }
+  
+  // Очищаем форму и закрываем диалог
+  newGroup.value = {
+    name: '',
+    description: ''
+  }
+  groupDialog.value = false
 }
 </script>
 
@@ -406,6 +467,61 @@ const addGroup = () => {
             @click="saveLook"
           >
             Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Диалог добавления группы -->
+    <v-dialog v-model="groupDialog" max-width="500">
+      <v-card>
+        <v-card-title class="text-h5">
+          Новая группа образов
+        </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="newGroup.name"
+                  label="Название группы"
+                  required
+                  :rules="[
+                    (v) => !!v || 'Название обязательно',
+                    (v) => !lookGroups.value.some(group => group.name === v) || 'Такая группа уже существует'
+                  ]"
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="12">
+                <v-textarea
+                  v-model="newGroup.description"
+                  label="Описание группы"
+                  rows="3"
+                  hint="Необязательное описание для группы"
+                  persistent-hint
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="grey-darken-1"
+            variant="text"
+            @click="groupDialog = false"
+          >
+            Отмена
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="saveGroup"
+          >
+            Создать
           </v-btn>
         </v-card-actions>
       </v-card>
