@@ -2,6 +2,10 @@
 import { ref, computed } from 'vue'
 import { mockLooks } from '@/mocks/looks'
 import { mockItems } from '@/mocks/wardrobe'
+import { Line } from 'vue-chartjs'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 // Данные для виджетов
 const recentLooks = computed(() => mockLooks.slice(0, 4))
@@ -20,6 +24,43 @@ const weather = ref({
   temp: 24,
   condition: 'Солнечно',
   icon: 'mdi-weather-sunny'
+})
+
+// Данные для графика использования гардероба
+const usageData = ref([
+  { date: '2024-01', count: 15 },
+  { date: '2024-02', count: 18 },
+  { date: '2024-03', count: 12 },
+  { date: '2024-04', count: 22 },
+  { date: '2024-05', count: 25 },
+  { date: '2024-06', count: 20 }
+])
+
+const chartData = computed(() => ({
+  labels: usageData.value.map(d => d.date),
+  datasets: [{
+    label: 'Использование',
+    data: usageData.value.map(d => d.count),
+    borderColor: '#1867C0',
+    backgroundColor: '#5CBBF6',
+    tension: 0.4
+  }]
+}))
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false
+}
+
+const currentUsage = computed(() => {
+  const lastMonth = usageData.value[usageData.value.length - 1]
+  const previousMonth = usageData.value[usageData.value.length - 2]
+  const change = lastMonth.count - previousMonth.count
+  return {
+    current: lastMonth.count,
+    change,
+    trend: change > 0 ? 'positive' : 'negative'
+  }
 })
 </script>
 
@@ -110,7 +151,43 @@ const weather = ref({
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="9">
+      <!-- График использования -->
+      <v-col cols="12" md="4">
+        <v-card class="mb-4">
+          <v-card-title class="pb-0">Использование гардероба</v-card-title>
+          <v-card-text>
+            <div class="d-flex align-center mb-2">
+              <span class="text-h4 mr-2">{{ currentUsage.current }}</span>
+              <v-chip
+                :color="currentUsage.trend === 'positive' ? 'success' : 'error'"
+                size="small"
+                class="ml-2"
+              >
+                <v-icon
+                  start
+                  size="small"
+                >
+                  {{ currentUsage.trend === 'positive' ? 'mdi-arrow-up' : 'mdi-arrow-down' }}
+                </v-icon>
+                {{ Math.abs(currentUsage.change) }}
+              </v-chip>
+            </div>
+            <div class="text-caption text-medium-emphasis mb-4">
+              образов за последний месяц
+            </div>
+            
+            <div style="height: 200px">
+              <Line
+                :data="chartData"
+                :options="chartOptions"
+              />
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+
+      <!-- Рекомендации -->
+      <v-col cols="12" md="5">
         <v-card class="mb-4">
           <v-card-title class="d-flex justify-space-between align-center">
             Рекомендации
@@ -225,5 +302,9 @@ const weather = ref({
 <style scoped>
 .gap-4 {
   gap: 16px;
+}
+
+.text-medium-emphasis {
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>

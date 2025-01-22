@@ -20,6 +20,7 @@ export interface WardrobeItem {
   characteristics: Characteristic[];
   care: Care;
   isArchived?: boolean;
+  lastWorn?: Date | null;
 }
 
 export const mockItems: WardrobeItem[] = [
