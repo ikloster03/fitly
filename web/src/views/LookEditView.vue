@@ -170,7 +170,7 @@ onUnmounted(() => {
                 <v-card-title>Вещи в образе</v-card-title>
                 <v-card-text>
                   <v-autocomplete
-                    v-model="look.items"
+                    v-model="look.items as any"
                     :items="availableItems"
                     label="Добавить вещь"
                     multiple

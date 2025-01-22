@@ -7,7 +7,6 @@ import interactionPlugin from '@fullcalendar/interaction'
 import type { CalendarLook } from '@/mocks/looks'
 import { useRouter } from 'vue-router'
 
-const today = ref(new Date().toISOString().substr(0, 10))
 const viewType = ref('dayGridMonth')
 const showLookDialog = ref(false)
 const selectedDate = ref('')
@@ -34,7 +33,7 @@ const hoveredLook = ref<CalendarLook | null>(null)
 const currentEventEl = ref<HTMLElement | null>(null)
 
 // Конфигурация календаря
-const calendarOptions = computed(() => ({
+const calendarOptions = computed<any>(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
   initialView: viewType.value,
   locale: 'ru',
@@ -56,7 +55,7 @@ const calendarOptions = computed(() => ({
       tags: look.tags
     }
   })),
-  eventContent: (arg) => {
+  eventContent: (arg: any) => {
     return {
       html: `
         <div class="fc-content">
@@ -73,19 +72,19 @@ const calendarOptions = computed(() => ({
       `
     }
   },
-  dateClick: (info) => {
+  dateClick: (info: any) => {
     selectedDate.value = info.dateStr
     showLookDialog.value = true
   },
-  eventClick: (info) => {
+  eventClick: (info: any) => {
     const look = looks.value.find(l => l.id === Number(info.event.id))
     if (look) {
-      newLook.value = { ...look }
+      newLook.value = { ...look } as any
       selectedDate.value = look.date
       showLookDialog.value = true
     }
   },
-  eventMouseEnter: (info) => {
+  eventMouseEnter: (info: any) => {
     const look = looks.value.find(l => l.id === Number(info.event.id))
     if (look) {
       currentEventEl.value = info.el
@@ -100,7 +99,7 @@ const calendarOptions = computed(() => ({
       showPopup.value = true
     }
   },
-  eventMouseLeave: (info) => {
+  eventMouseLeave: (info: any) => {
     // Проверяем, не навели ли мы на попап
     const relatedTarget = info.event.jsEvent.relatedTarget as HTMLElement
     if (!relatedTarget?.closest('.look-popup')) {
@@ -135,14 +134,14 @@ onUnmounted(() => {
 
 const saveLook = () => {
   if (newLook.value.title) {
-    const lookIndex = looks.value.findIndex(l => l.id === newLook.value.id)
+    const lookIndex = looks.value.findIndex(l => l.id === undefined)
     
     if (lookIndex !== -1) {
       // Обновляем существующий лук
       looks.value[lookIndex] = {
         ...newLook.value,
         date: selectedDate.value
-      } as Look
+      } as any
     } else {
       // Добавляем новый лук
       looks.value.push({
@@ -150,7 +149,7 @@ const saveLook = () => {
         date: selectedDate.value,
         ...newLook.value,
         tags: newLook.value.tags || []
-      } as Look)
+      } as any)
     }
     
     showLookDialog.value = false

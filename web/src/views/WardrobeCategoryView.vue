@@ -26,8 +26,6 @@ const category = ref({
   image: "",
 });
 
-const items = ref(mockItems);
-
 const dialog = ref(false);
 const groupDialog = ref(false);
 
@@ -125,7 +123,7 @@ const saveItem = () => {
       targetGroup.items.push(item);
     }
   } else {
-    ungroupedItems.value.push(item);
+    ungroupedItems.value.push(item as any);
   }
 
   // Очищаем форму и закрываем диалог
@@ -177,8 +175,8 @@ const deleteGroup = async (groupName: string) => {
     const group = itemGroups.value.find((g) => g.name === groupName);
     if (group) {
       // Перемещаем все вещи в ungroupedItems
-      ungroupedItems.value.push(...group.items);
-      // Удаляем группу
+      ungroupedItems.value.push(...group.items as any);
+      // Удаляем группу as any
       itemGroups.value = itemGroups.value.filter((g) => g.name !== groupName);
     }
   }

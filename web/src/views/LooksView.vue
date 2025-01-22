@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { mockLooks, type Look, groupedLooks, ungroupedLooks } from '@/mocks/looks'
+import { mockLooks, type Look, ungroupedLooks } from '@/mocks/looks'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -74,10 +74,6 @@ const saveLook = () => {
 
 const navigateToItem = (itemId: number) => {
   router.push(`/wardrobe/items/${itemId}`)
-}
-
-const editLook = (lookId: number) => {
-  router.push(`/looks/${lookId}/edit`)
 }
 
 const createLook = () => {
@@ -489,7 +485,7 @@ const saveGroup = () => {
                   required
                   :rules="[
                     (v) => !!v || 'Название обязательно',
-                    (v) => !lookGroups.value.some(group => group.name === v) || 'Такая группа уже существует'
+                    (v) => !lookGroups.some(group => group.name === v) || 'Такая группа уже существует'
                   ]"
                 ></v-text-field>
               </v-col>
