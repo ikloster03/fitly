@@ -157,4 +157,64 @@ export const groupedLooks = (looks: Look[]) => {
 // Добавим функцию для получения образов без группы
 export const ungroupedLooks = (looks: Look[]) => {
   return looks.filter(look => !look.group)
+}
+
+export const mockCalendarLooks = [
+  {
+    id: 1,
+    title: 'Деловой костюм',
+    date: '2025-01-20',
+    image: 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=600',
+    description: 'Классический костюм для важной встречи',
+    tags: ['офис', 'формальный', 'классика']
+  },
+  {
+    id: 2,
+    title: 'Casual образ',
+    date: '2025-01-21',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600',
+    description: 'Удобный повседневный образ',
+    tags: ['casual', 'джинсы', 'комфорт']
+  },
+  {
+    id: 3,
+    title: 'Вечерний выход',
+    date: '2025-01-22',
+    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600',
+    description: 'Элегантное платье для ужина',
+    tags: ['вечер', 'платье', 'элегантность']
+  },
+  {
+    id: 4,
+    title: 'Спортивный день',
+    date: '2025-01-23',
+    image: 'https://images.unsplash.com/photo-1483721310020-03333e577078?w=600',
+    description: 'Удобный комплект для тренировки',
+    tags: ['спорт', 'активность', 'комфорт']
+  },
+  {
+    id: 5,
+    title: 'Свидание',
+    date: '2025-01-24',
+    image: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?w=600',
+    description: 'Романтический образ для свидания',
+    tags: ['романтика', 'платье', 'свидание']
+  },
+  {
+    id: 6,
+    title: 'Выходной день',
+    date: '2025-01-25',
+    image: 'https://images.unsplash.com/photo-1523359346063-d879354c0ea5?w=600',
+    description: 'Комфортный образ для отдыха',
+    tags: ['casual', 'комфорт', 'выходной']
+  }
+]
+
+export interface CalendarLook {
+  id: number
+  title: string
+  date: string
+  image: string
+  description: string
+  tags: string[]
 } 
