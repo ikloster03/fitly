@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { mockCalendarLooks } from '@/mocks/looks'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import type { CalendarLook } from '@/mocks/looks'
+import { useRouter } from 'vue-router'
 
 const today = ref(new Date().toISOString().substr(0, 10))
 const viewType = ref('dayGridMonth')
@@ -25,6 +26,12 @@ const newLook = ref({
   description: '',
   tags: [] as string[]
 })
+
+const router = useRouter()
+const showPopup = ref(false)
+const popupPosition = ref({ x: 0, y: 0 })
+const hoveredLook = ref<CalendarLook | null>(null)
+const currentEventEl = ref<HTMLElement | null>(null)
 
 // Конфигурация календаря
 const calendarOptions = computed(() => ({
@@ -77,8 +84,54 @@ const calendarOptions = computed(() => ({
       selectedDate.value = look.date
       showLookDialog.value = true
     }
+  },
+  eventMouseEnter: (info) => {
+    const look = looks.value.find(l => l.id === Number(info.event.id))
+    if (look) {
+      currentEventEl.value = info.el
+      hoveredLook.value = look
+      const rect = info.el.getBoundingClientRect()
+      const calendarRect = info.el.closest('.calendar-container').getBoundingClientRect()
+      
+      popupPosition.value = {
+        x: rect.left - calendarRect.left + rect.width + 10,
+        y: rect.top - calendarRect.top
+      }
+      showPopup.value = true
+    }
+  },
+  eventMouseLeave: (info) => {
+    // Проверяем, не навели ли мы на попап
+    const relatedTarget = info.event.jsEvent.relatedTarget as HTMLElement
+    if (!relatedTarget?.closest('.look-popup')) {
+      hidePopupWithDelay()
+    }
   }
 }))
+
+// Функция для скрытия попапа с задержкой
+const hidePopupTimeout = ref<number | null>(null)
+const hidePopupWithDelay = () => {
+  hidePopupTimeout.value = window.setTimeout(() => {
+    showPopup.value = false
+    currentEventEl.value = null
+  }, 100)
+}
+
+// Функция для отмены скрытия попапа
+const cancelHidePopup = () => {
+  if (hidePopupTimeout.value) {
+    clearTimeout(hidePopupTimeout.value)
+    hidePopupTimeout.value = null
+  }
+}
+
+// Очистка таймаута при размонтировании компонента
+onUnmounted(() => {
+  if (hidePopupTimeout.value) {
+    clearTimeout(hidePopupTimeout.value)
+  }
+})
 
 const saveLook = () => {
   if (newLook.value.title) {
@@ -109,6 +162,10 @@ const saveLook = () => {
     }
   }
 }
+
+const navigateToLook = (lookId: number) => {
+  router.push(`/looks/${lookId}`)
+}
 </script>
 
 <template>
@@ -133,11 +190,54 @@ const saveLook = () => {
     </v-card>
     
     <!-- FullCalendar -->
-    <v-sheet height="600">
+    <v-sheet height="600" class="position-relative">
       <FullCalendar
         :options="calendarOptions"
         class="calendar-container"
       />
+      
+      <div
+        v-if="showPopup && hoveredLook"
+        class="look-popup"
+        :style="{
+          left: `${popupPosition.x}px`,
+          top: `${popupPosition.y}px`
+        }"
+        @mouseenter="cancelHidePopup"
+        @mouseleave="hidePopupWithDelay"
+      >
+        <v-card class="look-popup-card">
+          <v-img
+            :src="hoveredLook.image"
+            height="200"
+            cover
+          ></v-img>
+          <v-card-text>
+            <div class="text-h6">{{ hoveredLook.title }}</div>
+            <div class="text-body-2">{{ hoveredLook.description }}</div>
+            <v-chip-group class="mt-2">
+              <v-chip
+                v-for="tag in hoveredLook.tags"
+                :key="tag"
+                size="small"
+                class="mr-1"
+              >
+                {{ tag }}
+              </v-chip>
+            </v-chip-group>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="primary"
+              variant="text"
+              @click="navigateToLook(hoveredLook.id)"
+            >
+              Перейти к образу
+              <v-icon end icon="mdi-arrow-right"></v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </div>
     </v-sheet>
 
     <!-- Диалог для добавления/редактирования лука -->
@@ -221,5 +321,45 @@ const saveLook = () => {
 
 .mr-2 {
   margin-right: 8px;
+}
+
+.position-relative {
+  position: relative;
+}
+
+.look-popup {
+  position: absolute;
+  z-index: 1000;
+}
+
+.look-popup-card {
+  width: 300px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Добавляем небольшой отступ для плавного перехода курсора */
+.look-popup::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  width: 10px;
+  height: 100%;
+}
+
+/* Обновленная анимация */
+.look-popup-card {
+  animation: popup-horizontal 0.2s ease-out;
+}
+
+@keyframes popup-horizontal {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 </style> 
