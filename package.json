@@ -4,6 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "cd web && npm build"
+    "build": "cd web && npm run build"
   }
 }
