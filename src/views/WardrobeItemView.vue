@@ -309,6 +309,151 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Модальное окно со всеми луками -->
+    <v-dialog
+      v-model="allLooksDialog"
+      fullscreen
+      :scrim="false"
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar
+          color="primary"
+        >
+          <v-btn
+            icon
+            @click="allLooksDialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          
+          <v-toolbar-title>Все луки с вещью "{{ item.name }}"</v-toolbar-title>
+          
+          <v-spacer></v-spacer>
+          
+          <v-toolbar-items>
+            <!-- Кнопка режима выбора -->
+            <v-btn
+              v-if="!selectionMode"
+              variant="text"
+              @click="toggleSelectionMode"
+            >
+              <v-icon class="mr-2">mdi-checkbox-multiple-marked-outline</v-icon>
+              Выбрать
+            </v-btn>
+
+            <!-- Кнопки в режиме выбора -->
+            <template v-else>
+              <v-btn
+                variant="text"
+                color="error"
+                :disabled="selectedLooks.length === 0"
+                @click="deleteSelectedLooks"
+              >
+                <v-icon class="mr-2">mdi-delete</v-icon>
+                Удалить ({{ selectedLooks.length }})
+              </v-btn>
+              <v-btn
+                variant="text"
+                @click="toggleSelectionMode"
+              >
+                Отмена
+              </v-btn>
+            </template>
+
+            <!-- Кнопка создания -->
+            <v-btn
+              v-if="!selectionMode"
+              variant="text"
+              @click="createLook"
+            >
+              <v-icon class="mr-2">mdi-plus</v-icon>
+              Создать лук
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+
+        <v-container class="py-8">
+          <!-- Фильтры -->
+          <v-row class="mb-6" v-if="!selectionMode">
+            <v-col cols="12" sm="6" md="3">
+              <v-select
+                label="Сезон"
+                :items="['Весна', 'Лето', 'Осень', 'Зима']"
+                multiple
+                chips
+                clearable
+              ></v-select>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+              <v-text-field
+                label="Поиск по названию"
+                prepend-inner-icon="mdi-magnify"
+                clearable
+              ></v-text-field>
+            </v-col>
+          </v-row>
+
+          <!-- Сетка луков -->
+          <v-row>
+            <v-col
+              v-for="look in allLooks"
+              :key="look.id"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+            >
+              <v-card
+                :class="['look-card', { 'selectable': selectionMode }]"
+                elevation="0"
+                @click="selectionMode ? toggleLookSelection(look.id) : $router.push(`/looks/${look.id}`)"
+              >
+                <div class="look-image-container">
+                  <v-img
+                    :src="look.image"
+                    height="300"
+                    cover
+                    class="rounded-lg"
+                  >
+                    <template v-slot:placeholder>
+                      <div class="d-flex align-center justify-center fill-height">
+                        <v-icon size="large" color="grey-lighten-1">
+                          mdi-image
+                        </v-icon>
+                      </div>
+                    </template>
+                  </v-img>
+                  
+                  <!-- Оверлей выбора -->
+                  <div
+                    v-if="selectionMode"
+                    class="selection-overlay"
+                    :class="{ 'selected': selectedLooks.includes(look.id) }"
+                  >
+                    <v-icon
+                      size="large"
+                      :color="selectedLooks.includes(look.id) ? 'white' : 'grey-lighten-1'"
+                    >
+                      {{ selectedLooks.includes(look.id) ? 'mdi-checkbox-marked-circle' : 'mdi-checkbox-blank-circle-outline' }}
+                    </v-icon>
+                  </div>
+                </div>
+                
+                <v-card-title class="pt-2 px-0 text-h6">
+                  {{ look.name }}
+                </v-card-title>
+                
+                <v-card-subtitle class="px-0">
+                  {{ look.season.join(', ') }}
+                </v-card-subtitle>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -461,14 +606,80 @@ const previewLooks = ref<Look[]>([
   }
 ])
 
+const allLooksDialog = ref(false)
+
+// Расширенный список луков для модального окна
+const allLooks = ref<Look[]>([
+  {
+    id: 1,
+    name: 'Повседневный casual',
+    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
+    season: ['Весна', 'Лето']
+  },
+  {
+    id: 2,
+    name: 'Деловой стиль',
+    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea',
+    season: ['Осень', 'Зима']
+  },
+  {
+    id: 3,
+    name: 'Вечерний выход',
+    image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157',
+    season: ['Лето']
+  },
+  {
+    id: 4,
+    name: 'Спортивный лук',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
+    season: ['Весна', 'Лето']
+  },
+  {
+    id: 5,
+    name: 'Для прогулки',
+    image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105',
+    season: ['Осень']
+  },
+  // ... можно добавить больше луков
+])
+
 const showAllLooks = () => {
-  // Здесь будет навигация на страницу со всеми луками
-  console.log('Показать все луки')
+  allLooksDialog.value = true
 }
 
 const createLook = () => {
-  // Здесь будет навигация на страницу создания лука
-  console.log('Создать новый лук')
+  router.push({
+    name: 'look-new',
+    query: {
+      itemId: route.params.id // передаем ID текущей вещи в параметрах
+    }
+  })
+}
+
+const selectionMode = ref(false)
+const selectedLooks = ref<number[]>([])
+
+const toggleSelectionMode = () => {
+  selectionMode.value = !selectionMode.value
+  if (!selectionMode.value) {
+    selectedLooks.value = [] // Сбрасываем выбор при выходе из режима
+  }
+}
+
+const toggleLookSelection = (lookId: number) => {
+  const index = selectedLooks.value.indexOf(lookId)
+  if (index === -1) {
+    selectedLooks.value.push(lookId)
+  } else {
+    selectedLooks.value.splice(index, 1)
+  }
+}
+
+const deleteSelectedLooks = () => {
+  // Здесь будет логика удаления на бэкенде
+  allLooks.value = allLooks.value.filter(look => !selectedLooks.value.includes(look.id))
+  selectedLooks.value = [] // Очищаем выбор
+  selectionMode.value = false // Выходим из режима выбора
 }
 </script>
 
@@ -492,5 +703,47 @@ const createLook = () => {
 
 .v-card-title {
   line-height: 1.2;
+}
+
+.dialog-bottom-transition-enter-active,
+.dialog-bottom-transition-leave-active {
+  transition: transform .3s ease-in-out;
+}
+
+.dialog-bottom-transition-enter-from,
+.dialog-bottom-transition-leave-to {
+  transform: translateY(100%);
+}
+
+.look-image-container {
+  position: relative;
+}
+
+.selection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 8px;
+}
+
+.selectable:hover .selection-overlay {
+  opacity: 1;
+}
+
+.selection-overlay.selected {
+  opacity: 1;
+  background-color: rgba(var(--v-theme-primary), 0.4);
+}
+
+.selectable {
+  cursor: pointer;
 }
 </style>
