@@ -188,6 +188,93 @@
       </v-col>
     </v-row>
 
+    <!-- Луки с этой вещью -->
+    <v-row class="mt-4">
+      <v-col cols="12">
+        <v-card>
+          <v-card-title class="d-flex align-center">
+            Луки с этой вещью
+            <v-spacer></v-spacer>
+            <v-btn
+              variant="text"
+              color="primary"
+              @click="showAllLooks"
+              class="text-none"
+            >
+              Смотреть все луки
+              <v-icon class="ml-1">mdi-chevron-right</v-icon>
+            </v-btn>
+          </v-card-title>
+
+          <v-card-text>
+            <v-row>
+              <v-col
+                v-for="look in previewLooks"
+                :key="look.id"
+                cols="12"
+                sm="6"
+                md="4"
+                lg="2.4"
+              >
+                <v-card
+                  :to="`/looks/${look.id}`"
+                  elevation="0"
+                  class="look-card"
+                >
+                  <v-img
+                    :src="look.image"
+                    height="200"
+                    cover
+                    class="rounded-lg"
+                  >
+                    <template v-slot:placeholder>
+                      <div class="d-flex align-center justify-center fill-height">
+                        <v-icon size="large" color="grey-lighten-1">
+                          mdi-image
+                        </v-icon>
+                      </div>
+                    </template>
+                  </v-img>
+                  
+                  <v-card-title class="pt-2 px-0 text-subtitle-1">
+                    {{ look.name }}
+                  </v-card-title>
+                  
+                  <v-card-subtitle class="px-0 pb-0">
+                    {{ look.season.join(', ') }}
+                  </v-card-subtitle>
+                </v-card>
+              </v-col>
+
+              <v-col
+                v-if="previewLooks.length === 0"
+                cols="12"
+                class="text-center py-8"
+              >
+                <v-icon
+                  size="64"
+                  color="grey-lighten-1"
+                  class="mb-2"
+                >
+                  mdi-tshirt-crew
+                </v-icon>
+                <div class="text-grey">
+                  Эта вещь пока не используется ни в одном луке
+                </div>
+                <v-btn
+                  color="primary"
+                  class="mt-4"
+                  @click="createLook"
+                >
+                  Создать лук
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <!-- Диалог подтверждения архивации -->
     <v-dialog v-model="archiveDialog" max-width="400">
       <v-card>
@@ -344,6 +431,45 @@ onUnmounted(() => {
     URL.revokeObjectURL(previewImage.value);
   }
 });
+
+interface Look {
+  id: number
+  name: string
+  image: string
+  season: string[]
+}
+
+// Моковые данные для луков
+const previewLooks = ref<Look[]>([
+  {
+    id: 1,
+    name: 'Повседневный casual',
+    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27',
+    season: ['Весна', 'Лето']
+  },
+  {
+    id: 2,
+    name: 'Деловой стиль',
+    image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea',
+    season: ['Осень', 'Зима']
+  },
+  {
+    id: 3,
+    name: 'Вечерний выход',
+    image: 'https://images.unsplash.com/photo-1603252109303-2751441dd157',
+    season: ['Лето']
+  }
+])
+
+const showAllLooks = () => {
+  // Здесь будет навигация на страницу со всеми луками
+  console.log('Показать все луки')
+}
+
+const createLook = () => {
+  // Здесь будет навигация на страницу создания лука
+  console.log('Создать новый лук')
+}
 </script>
 
 <style scoped>
@@ -354,5 +480,17 @@ onUnmounted(() => {
 
 .v-img {
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.look-card {
+  transition: transform 0.2s;
+}
+
+.look-card:hover {
+  transform: translateY(-4px);
+}
+
+.v-card-title {
+  line-height: 1.2;
 }
 </style>
