@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LookEditView from '@/views/LookEditView.vue'
+import ItemsTinderView from '@/views/ItemsTinderView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -54,6 +55,11 @@ const router = createRouter({
       path: '/looks/:id/edit',
       name: 'look-edit',
       component: LookEditView
+    },
+    {
+      path: '/looks/:lookId/items-tinder',
+      name: 'items-tinder',
+      component: ItemsTinderView
     }
   ],
 });

@@ -47,8 +47,42 @@ const saveLook = async () => {
     look.value.image = previewImage.value
   }
 
+  // Здесь будет реальный запрос к API
+  // Пока используем моковые данные
+  if (!look.value.id) {
+    look.value.id = Math.max(...mockLooks.map(l => l.id)) + 1
+    mockLooks.push(look.value)
+  } else {
+    const index = mockLooks.findIndex(l => l.id === look.value.id)
+    if (index !== -1) {
+      mockLooks[index] = { ...look.value }
+    }
+  }
+
   console.log('Сохраняем образ:', look.value)
-  router.push('/looks')
+  return look.value
+}
+
+const goToItemsTinder = () => {
+  if (!look.value.id) {
+    // Если это новый лук (нет id), сначала сохраняем его
+    saveLook().then(() => {
+      router.push({
+        name: 'items-tinder',
+        params: { 
+          lookId: look.value.id.toString()
+        }
+      })
+    })
+  } else {
+    // Если лук уже существует, просто переходим на тиндер
+    router.push({
+      name: 'items-tinder',
+      params: { 
+        lookId: look.value.id.toString()
+      }
+    })
+  }
 }
 
 onMounted(async () => {
@@ -212,6 +246,15 @@ onUnmounted(() => {
           </v-card-text>
 
           <v-card-actions class="pa-4">
+            <v-btn
+              color="secondary"
+              variant="text"
+              @click="goToItemsTinder"
+              class="mr-2"
+            >
+              <v-icon class="mr-2">mdi-cards</v-icon>
+              Тиндер вещей
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn
               color="primary"
